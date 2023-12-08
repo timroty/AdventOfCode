@@ -1,26 +1,23 @@
-fs = require("fs");
+const utils = require("../utils");
 
-fs.readFile("input.txt", "utf8", function (err, data) {
-  if (err) {
-    return console.log(err);
-  }
+(async () => {
+  const file_data = await utils.readFile();
 
-  let schematicArray = data.split('\n');
-  
-  processsSchematic(schematicArray);
-});
+  processsSchematic(file_data);
+})();
 
-function processsSchematic(schematicArray) {
+function processsSchematic(data) {
+  const schematicArray = data.split("\n");
   const schematicWidth = schematicArray[0].length;
   const schematicHeight = schematicArray.length;
   const schematicLocationTemplate = {
-    "isSymbol": false,
-    "isNumber": false,
-    "numberId": null
+    isSymbol: false,
+    isNumber: false,
+    numberId: null,
   };
   const numberLocationTemplate = {
-    "value": null,
-    "checked": false,
+    value: null,
+    checked: false,
   };
 
   let nextNumberId = 1;
@@ -28,7 +25,7 @@ function processsSchematic(schematicArray) {
   let schematicNumberInfo = {};
 
   for (let i = 0; i < schematicHeight; i++) {
-    let numberString = '';
+    let numberString = "";
     let wasNumber = false;
 
     for (let j = 0; j < schematicWidth; j++) {
@@ -38,57 +35,87 @@ function processsSchematic(schematicArray) {
         wasNumber = true;
         numberString += schematicArray[i][j];
 
-        let locationInfo = Object.assign({}, JSON.parse(JSON.stringify(schematicLocationTemplate)));
+        let locationInfo = Object.assign(
+          {},
+          JSON.parse(JSON.stringify(schematicLocationTemplate))
+        );
         locationInfo.isNumber = true;
         locationInfo.numberId = nextNumberId;
 
         let temp = {};
         temp[location] = JSON.parse(JSON.stringify(locationInfo));
 
-        schematicInfo = Object.assign(schematicInfo, JSON.parse(JSON.stringify(temp)));
+        schematicInfo = Object.assign(
+          schematicInfo,
+          JSON.parse(JSON.stringify(temp))
+        );
       } else {
         if (wasNumber) {
-          let locationInfo = Object.assign({}, JSON.parse(JSON.stringify(numberLocationTemplate)));
+          let locationInfo = Object.assign(
+            {},
+            JSON.parse(JSON.stringify(numberLocationTemplate))
+          );
           locationInfo.value = Number(numberString);
 
           let temp = {};
           temp[nextNumberId] = JSON.parse(JSON.stringify(locationInfo));
 
-          schematicNumberInfo = Object.assign(schematicNumberInfo, JSON.parse(JSON.stringify(temp)));
+          schematicNumberInfo = Object.assign(
+            schematicNumberInfo,
+            JSON.parse(JSON.stringify(temp))
+          );
 
           nextNumberId++;
-          numberString = '';
+          numberString = "";
           wasNumber = false;
         }
 
-        if (schematicArray[i][j] === '.') {
-          let locationInfo = Object.assign({}, JSON.parse(JSON.stringify(schematicLocationTemplate)));
+        if (schematicArray[i][j] === ".") {
+          let locationInfo = Object.assign(
+            {},
+            JSON.parse(JSON.stringify(schematicLocationTemplate))
+          );
           let temp = {};
           temp[location] = JSON.parse(JSON.stringify(locationInfo));
 
-          schematicInfo = Object.assign(schematicInfo, JSON.parse(JSON.stringify(temp)));
+          schematicInfo = Object.assign(
+            schematicInfo,
+            JSON.parse(JSON.stringify(temp))
+          );
         } else {
-          let locationInfo = Object.assign({}, JSON.parse(JSON.stringify(schematicLocationTemplate)));
+          let locationInfo = Object.assign(
+            {},
+            JSON.parse(JSON.stringify(schematicLocationTemplate))
+          );
           locationInfo.isSymbol = true;
 
           let temp = {};
           temp[location] = JSON.parse(JSON.stringify(locationInfo));
 
-          schematicInfo = Object.assign(schematicInfo, JSON.parse(JSON.stringify(temp)));
+          schematicInfo = Object.assign(
+            schematicInfo,
+            JSON.parse(JSON.stringify(temp))
+          );
         }
       }
     }
     if (wasNumber) {
-      let locationInfo = Object.assign({}, JSON.parse(JSON.stringify(numberLocationTemplate)));
+      let locationInfo = Object.assign(
+        {},
+        JSON.parse(JSON.stringify(numberLocationTemplate))
+      );
       locationInfo.value = Number(numberString);
 
       let temp = {};
       temp[nextNumberId] = JSON.parse(JSON.stringify(locationInfo));
 
-      schematicNumberInfo = Object.assign(schematicNumberInfo, JSON.parse(JSON.stringify(temp)));
+      schematicNumberInfo = Object.assign(
+        schematicNumberInfo,
+        JSON.parse(JSON.stringify(temp))
+      );
 
       nextNumberId++;
-      numberString = '';
+      numberString = "";
       wasNumber = false;
     }
   }
@@ -97,20 +124,23 @@ function processsSchematic(schematicArray) {
 
   for (let i = 0; i < schematicHeight; i++) {
     for (let j = 0; j < schematicWidth; j++) {
-      if (!schematicInfo[`${i},${j}`].isNumber || schematicNumberInfo[schematicInfo[`${i},${j}`].numberId].checked)
+      if (
+        !schematicInfo[`${i},${j}`].isNumber ||
+        schematicNumberInfo[schematicInfo[`${i},${j}`].numberId].checked
+      )
         continue;
 
       if (
-        (schematicInfo[`${i - 1},${j - 1}`]?.isSymbol === true) ||
-        (schematicInfo[`${i - 1},${j}`]?.isSymbol === true) ||
-        (schematicInfo[`${i - 1},${j + 1}`]?.isSymbol === true) ||
+        schematicInfo[`${i - 1},${j - 1}`]?.isSymbol === true ||
+        schematicInfo[`${i - 1},${j}`]?.isSymbol === true ||
+        schematicInfo[`${i - 1},${j + 1}`]?.isSymbol === true ||
         // Check the items in the same row
-        (schematicInfo[`${i},${j - 1}`]?.isSymbol === true) ||
-        (schematicInfo[`${i},${j + 1}`]?.isSymbol === true) ||
+        schematicInfo[`${i},${j - 1}`]?.isSymbol === true ||
+        schematicInfo[`${i},${j + 1}`]?.isSymbol === true ||
         // Check the items in the row below
-        (schematicInfo[`${i + 1},${j - 1}`]?.isSymbol === true) ||
-        (schematicInfo[`${i + 1},${j}`]?.isSymbol === true) ||
-        (schematicInfo[`${i + 1},${j + 1}`]?.isSymbol === true)
+        schematicInfo[`${i + 1},${j - 1}`]?.isSymbol === true ||
+        schematicInfo[`${i + 1},${j}`]?.isSymbol === true ||
+        schematicInfo[`${i + 1},${j + 1}`]?.isSymbol === true
       ) {
         schematicNumberInfo[schematicInfo[`${i},${j}`].numberId].checked = true;
         sum += schematicNumberInfo[schematicInfo[`${i},${j}`].numberId].value;

@@ -1,17 +1,15 @@
-fs = require("fs");
+const utils = require("../utils");
 
-fs.readFile("input.txt", "utf8", function (err, data) {
-  if (err) {
-    return console.log(err);
-  }
+(async () => {
+  const file_data = await utils.readFile();
 
-  let gameArray = data.split("\n");
+  let gameArray = file_data.split("\n");
 
-  processGames(gameArray);
-  processGames2(gameArray);
-});
+  processGames_1(gameArray);
+  processGames_2(gameArray);
+})();
 
-function processGames(gameArray) {
+function processGames_1(gameArray) {
   const redCubeCount = 12;
   const greenCubeCount = 13;
   const blueCubeCount = 14;
@@ -58,7 +56,7 @@ function processGames(gameArray) {
   console.log(`Part 1: ${sum}`);
 }
 
-function processGames2(gameArray) {
+function processGames_2(gameArray) {
   let powerSum = 0;
   for (let i = 0; i < gameArray.length; i++) {
     const gameSplit = gameArray[i].split(":");

@@ -1,19 +1,15 @@
-fs = require("fs");
+const utils = require("../utils");
 
-let calibrationArray;
+(async () => {
+  const file_data = await utils.readFile();
 
-fs.readFile("input.txt", "utf8", function (err, data) {
-  if (err) {
-    return console.log(err);
-  }
+  const calibrationArray = file_data.split("\n");
 
-  calibrationArray = data.split("\n");
+  processCalibrations_1(calibrationArray);
+  processCalibrations_2(calibrationArray);
+})();
 
-  //processCalibrationsPart1();
-  processCalibrationsPart2();
-});
-
-function processCalibrationsPart1() {
+function processCalibrations_1(calibrationArray) {
   let sum = 0;
   for (let i = 0; i < calibrationArray.length; i++) {
     let leftPointer = null;
@@ -38,10 +34,10 @@ function processCalibrationsPart1() {
     sum += Number(concattedNumber);
   }
 
-  console.log(sum);
+  console.log(`Part 1: ${sum}`);
 }
 
-function processCalibrationsPart2() {
+function processCalibrations_2(calibrationArray) {
   let sum = 0;
 
   const digitWordArray = [
@@ -111,5 +107,5 @@ function processCalibrationsPart2() {
     sum += Number(concattedNumber);
   }
 
-  console.log(sum);
+  console.log(`Part 2: ${sum}`);
 }
